@@ -1,0 +1,157 @@
+<h1>設定</h1>
+<%= link_to('カレンダー', calendar_index_path) %>
+
+
+<h2>定期的な当番の追加</h2>
+
+<%= form_tag shifts_create_multiple_shifts_path do %>
+    
+  開始日：　<%= date_field :start_date, "t", value: Date.today %><br>
+  終了日：　<%= date_field :end_date, "t", value: Date.today + 1.month %><br>
+  曜日：　
+  <label><%= radio_button_tag :y, 1 %>月</label>
+  <label><%= radio_button_tag :y, 2 %>火</label>
+  <label><%= radio_button_tag :y, 3 %>水</label>
+  <label><%= radio_button_tag :y, 4 %>木</label>
+  <label><%= radio_button_tag :y, 5 %>金</label>
+  <label><%= radio_button_tag :y, 6 %>土</label>
+  <label><%= radio_button_tag :y, 0 %>日</label>
+  <br>
+  イベント：　<%= select_tag :event, options_from_collection_for_select(@events.where(flg: true), :id, :name) %><br>
+  担当者： <%= select_tag :member, options_from_collection_for_select(@members.where(flg: true), :id, :name) %><br>
+  <%= submit_tag "登録" %>
+  
+<% end %>
+
+<h2>イベントの時間を変更</h2>
+
+<%= form_tag shifts_set_time_path do %>
+    
+  開始日：　<%= date_field :start_date, "t", value: Date.today %><br>
+  終了日：　<%= date_field :end_date, "t", value: Date.today + 1.month %><br>
+  曜日：　
+  <label><%= radio_button_tag :y, 1 %>月</label>
+  <label><%= radio_button_tag :y, 2 %>火</label>
+  <label><%= radio_button_tag :y, 3 %>水</label>
+  <label><%= radio_button_tag :y, 4 %>木</label>
+  <label><%= radio_button_tag :y, 5 %>金</label>
+  <label><%= radio_button_tag :y, 6 %>土</label>
+  <label><%= radio_button_tag :y, 0 %>日</label><br>
+  イベント：　<%= select_tag :event, options_from_collection_for_select(@events.where(flg: true), :id, :name) %><br>
+  <!-- 最小最大が設定できない。。 -->
+  開始時間：<%= number_field_tag :s_hr, min: 0, max: 24, step: 1 %>時<%= number_field_tag :s_min, min: 0, max: 59, step: 1 %>分 <br>
+  終了時間：<%= number_field_tag :e_hr, min: 0, max: 24, step: 1 %>時<%= number_field_tag :e_min, min: 0, max: 59, step: 1 %>分 <br>
+  <%= submit_tag "登録" %>
+<% end %>
+
+
+<h2>メンバーの設定</h2>
+<table class='table'>
+  <tr><th>現在の設定</th><th>変更フォーム</th></tr>
+<% @members.each do |member| %>
+  <tr><td>
+  <!-- 無効なものは色を変えたい -->
+    <% if !member.flg %>
+      (無効)<br>
+    <% end %>
+    <%= member.name %><br>
+    <%= member.email if @settings.gcal && !member.email.blank? %><br>
+    <%= link_to('メンバーの無効化', controller: :members, action: :deactivate, id: member.id) if member.flg %>
+    <%= link_to('メンバーの有効化', controller: :members, action: :activate, id: member.id) if !member.flg %>
+  </td><td>
+  <%= form_for Member.find(member.id), url: url_for(controller: :members, action: :update, id: member.id) do |f| %>
+    <%= f.hidden_field :flg, :value => true %>
+    名前：<%= f.text_field :name, value: member.name %><br>
+    <% if @settings.gcal %>
+      メールアドレス：<%= f.text_field :email, value: member.email %><br>
+    <% end %>
+    <%= f.submit %>
+  </td></tr>
+  <% end %>
+<% end %>
+
+  <tr><td>
+    
+  </td><td>
+  <%= form_for(Member.new) do |f| %>
+    <%= f.hidden_field :flg, :value => true %>
+    名前：<%= f.text_field :name %><br>
+    <% if @settings.gcal %>
+      メールアドレス：<%= f.text_field :email %><br>
+    <% end %>
+    <%= f.submit %>
+  </td></tr>
+  <% end %>
+</table>
+
+<h2>イベントの設定</h2>
+<table class='table'>
+  <tr><th>現在の設定</th><th>変更フォーム</th></tr>
+<% @events.each do |event| %>
+  <tr><td>
+    <% if !event.flg %>
+      (無効)<br>
+    <% end %>
+    <%= event.name %><br>
+    <%= @youbi[1] if event.mon %>
+    <%= @youbi[2] if event.tue %>
+    <%= @youbi[3] if event.wed %>
+    <%= @youbi[4] if event.thu %>
+    <%= @youbi[5] if event.fri %>
+    <%= @youbi[6] if event.sat %>
+    <%= @youbi[0] if event.sun %><br>
+    <%= link_to('イベントの無効化', controller: :events, action: :deactivate, id: event.id) if event.flg %>
+    <%= link_to('イベントの有効化', controller: :events, action: :activate, id: event.id) if !event.flg %>
+  </td><td>
+  <%= form_for Event.find(event.id), url: url_for(controller: :events, action: :update, id: event.id) do |f| %>
+    <%= f.hidden_field :flg, :value => true %>
+    名前：<%= f.text_field :name, :value => event.name %><br>
+    曜日：
+    <label><%= f.check_box :mon, {checked: event.mon}, true, false %><%= @youbi[1] %></label>
+    <label><%= f.check_box :tue, {checked: event.tue}, true, false %><%= @youbi[2] %></label>
+    <label><%= f.check_box :wed, {checked: event.wed}, true, false %><%= @youbi[3] %></label>
+    <label><%= f.check_box :thu, {checked: event.thu}, true, false %><%= @youbi[4] %></label>
+    <label><%= f.check_box :fri, {checked: event.fri}, true, false %><%= @youbi[5] %></label>
+    <label><%= f.check_box :sat, {checked: event.sat}, true, false %><%= @youbi[6] %></label>
+    <label><%= f.check_box :sun, {checked: event.sun}, true, false %><%= @youbi[0] %></label> 
+    <%= f.submit %>
+  <% end %>
+  </td></tr>
+<% end %>
+
+<tr>
+<td> </td>
+<td>
+  <%= form_for Event.new do |f| %>
+    <%= f.hidden_field :flg, :value => true %>
+    名前：<%= f.text_field :name %><br>
+    曜日：
+    <label><%= f.check_box :mon, {checked: true}, true, false %><%= @youbi[1] %></label>
+    <label><%= f.check_box :tue, {checked: true}, true, false %><%= @youbi[2] %></label>
+    <label><%= f.check_box :wed, {checked: true}, true, false %><%= @youbi[3] %></label>
+    <label><%= f.check_box :thu, {checked: true}, true, false %><%= @youbi[4] %></label>
+    <label><%= f.check_box :fri, {checked: true}, true, false %><%= @youbi[5] %></label>
+    <label><%= f.check_box :sat, {checked: false}, true, false %><%= @youbi[6] %></label>
+    <label><%= f.check_box :sun, {checked: false}, true, false %><%= @youbi[0] %></label> 
+    <%= f.submit %>
+    <% end %>
+  
+</td>
+</tr>
+</table>
+
+
+<h2>基本設定（曜日の設定は意味ない）</h2>
+  <%= form_for Setting.first, url: url_for(controller: :settings, action: :update, id: 1) do |f| %>
+    <label><%= f.check_box :mon, {checked: @settings.mon}, true, false %><%= @youbi[1] %></label>
+    <label><%= f.check_box :tue, {checked: @settings.tue}, true, false %><%= @youbi[2] %></label>
+    <label><%= f.check_box :wed, {checked: @settings.wed}, true, false %><%= @youbi[3] %></label>
+    <label><%= f.check_box :thu, {checked: @settings.thu}, true, false %><%= @youbi[4] %></label>
+    <label><%= f.check_box :fri, {checked: @settings.fri}, true, false %><%= @youbi[5] %></label>
+    <label><%= f.check_box :sat, {checked: @settings.sat}, true, false %><%= @youbi[6] %></label>
+    <label><%= f.check_box :sun, {checked: @settings.sun}, true, false %><%= @youbi[0] %></label><br>
+    登録した予定をGoogleカレンダーと
+    <label><%= f.radio_button :gcal, true, {checked: @settings.gcal} %>連携する</label>
+    <label><%= f.radio_button :gcal, false, {checked: !@settings.gcal} %>連携しない</label>
+    <%= f.submit %>
+  <% end %>

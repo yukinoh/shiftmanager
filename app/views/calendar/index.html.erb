@@ -1,0 +1,107 @@
+<h1>カレンダー</h1>
+<%= link_to('設定', settings_index_path) %><br><br>
+
+<!-- リンクに出ない方法？ -->
+<%= link_to('前の週', calendar_index_path(i: @i-1)) %> | 
+<%= link_to('今日', calendar_index_path) %> |
+<%= link_to('次の週', calendar_index_path(i: @i+1)) %>
+
+<table class='table'>
+  
+  <!-- Draw calendar -->
+  <tr>
+    <th></th>
+    <% for i in 0..6 do %>
+      <th>
+      <% t = @calendar_starts_from + i.day %>
+      <%= t.strftime('%m月%d日(%a)')  %>
+      <% if @wday_list[t.wday] == false %>
+        (休)
+      <% end %>
+      </th>
+    <% end %> 
+  </tr>
+  
+  <!-- Draw event rows -->
+  <% @events.each do |event| %>
+  <% event_wday = [event.sun, event.mon, event.tue, event.wed, event.thu, event.fri, event.sat] %>
+  <tr>
+    <th>
+      <%= event.name %>
+      <%= event.starts_at.to_s.slice!(0..(event.starts_at.to_s.size-3)) %>:<%= event.starts_at.to_s.slice!((event.starts_at.to_s.size-2)..event.starts_at.to_s.size-1) %>
+      〜<%= event.ends_at.to_s.slice!(0..(event.ends_at.to_s.size-3)) %>:<%= event.ends_at.to_s.slice!((event.ends_at.to_s.size-2)..event.ends_at.to_s.size-1) %>
+    </th>
+    <% for i in 0..6 do %>
+      <% t = @calendar_starts_from + i.day %>
+      <td>
+        <% if event_wday[t.wday] == true %>
+          <% @members.each do |member| %>
+            <!-- ↓これここに書かない方が良い？？ -->
+            <!-- ↓これ関連づけたらもっと簡単？ -->
+            <% s = Shift.where(happens_on: t, event_id: event.id) %>
+            <% if s.empty? %>
+              <!-- 誰もアサインされていないシフト -->
+              <%= form_for(Shift.new) do |f| %>
+                <%= f.hidden_field :happens_on, :value => t %>
+                <%= f.hidden_field :event_id, :value => event.id %>
+                <%= f.hidden_field :member_id, :value => member.id %>
+                <%= f.submit member.name, {class: 'active_btn'} %>
+              <% end %>
+            <% else %>
+              <!-- アサインされている人が複数人いるときに、アサインされていない人が繰り返し表示されてしまうのを防ぐフラグ。もっといい方法ない？ -->
+              <% flg = true %>
+              <% s.each do |shift| %>
+                <!-- なぜかto_iが必要？whereやfind_byでは検索できている -->
+                <% if shift.member_id.to_i == member.id.to_i %>
+                  <!-- アサイン済みのメンバー -->
+                  <!-- <%= link_to(member.name, shifts_path(id: shift.id)) %> -->
+                  <%= link_to member.name, {controller: :shifts, action: :delete, :id => shift.id}, class: 'selected_btn' %>
+                <% elsif s.find_by(member_id: member.id) == nil && flg %>
+                  <!-- アサイン済みのメンバーがいるシフトにおける他のメンバー -->
+                  <!-- 誰もアサインされていないシフトと同じだから外部かすべき？ -->
+                  <%= form_for(Shift.new) do |f| %>
+                    <%= f.hidden_field :happens_on, :value => t %>
+                    <%= f.hidden_field :event_id, :value => event.id %>
+                    <%= f.hidden_field :member_id, :value => member.id %>
+                    <%= f.submit member.name, {class: 'active_btn'} %>
+                  <% end %>
+                  <% flg = false %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% else %>
+          -
+        <% end %>
+      </td>
+    <% end %>
+  </tr>
+<% end %>
+
+
+  <tr><th>メモ<br><small>*をクリックして削除</small></th>    
+    <% for i in 0..6 do %>
+      <% t = @calendar_starts_from + i.day %>
+      <td>
+      <% n = Note.where(created_for: t) %>
+      <% if !n.nil? %>
+        <% n.each do |note| %>
+          <small>
+            <%= note.content %>
+            <%= link_to('*', controller: :notes, action: :delete, id: note.id) %>
+          </small> 
+        <% end %>
+      <% end %>
+      
+    <%= form_for Note.new do |f| %>
+      <%= f.hidden_field :created_for, :value => t %>
+      <%= f.text_area :content, placeholder: "メモを追加" %> <br>
+    <%= f.submit "追加" %>
+    <% end %>
+      
+      </td>
+    <% end %>
+  </tr>
+
+
+</table>

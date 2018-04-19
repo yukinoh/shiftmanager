@@ -1,0 +1,149 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+.selected_btn {
+  display: inline-block;
+  width: 80px;
+  height: 25px;
+  text-align: center;
+  text-decoration: none;
+  line-height: 25px;
+  outline: none;
+  background-color: #ffffff;
+  border: 1px solid #ff6347;
+  color: #ff6347;
+}
+.selected_btn::before,
+.selected_btn::after {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  content: '';
+}
+.selected_btn,
+.selected_btn::before,
+.selected_btn::after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}
+.selected_btn:hover {
+  background-color: #cbcbcb;
+  border-color: #606060;
+  color: #676767;
+}
+
+.active_btn {
+  display: inline-block;
+  width: 60px;
+  height: 20px;
+  text-align: center;
+  text-decoration: none;
+  line-height: 20px;
+  outline: none;
+  background-color: #eff7ff;
+  border: 1px solid #7f7fff;
+  color: #7f7fff;
+}
+.active_btn::before,
+.active_btn::after {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  content: '';
+}
+.active_btn,
+.active_btn::before,
+.active_btn::after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}
+.active_btn:hover {
+  background-color: #7f7fff;
+  border-color: #59b1eb;
+  color: #fff;
+}
+
+.inactive_btn {
+  display: inline-block;
+  width: 80px;
+  height: 25px;
+  text-align: center;
+  text-decoration: none;
+  line-height: 25px;
+  outline: none;
+  background-color: #d3d3d3;
+  border: 1px solid #d3d3d3;
+  color: #efefef;
+}
+.inactive_btn::before,
+.inactive_btn::after {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  content: '';
+}
+.inactive_btn,
+.inactive_btn::before,
+.inactive_btn::after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}
+.inactive_btn:hover {
+  background-color: #7f7fff;
+  border-color: #efefef;
+  color: #fff;
+}
+
+
+.table {	
+	width: 80%;						/* テーブルの横幅を指定する */
+	font-family: "メイリオ", sans-serif;/* フォントのスタイルを指定する */
+	margin-left: auto;				/* 左側の余白を自動に指定する */
+	margin-right: auto;				/* 右側の余白を自動に指定する */
+	border-collapse: collapse;		/* 隣接するセルの罫線を離して表示する */
+	border-spacing: 0px;			/* セルの罫線の間隔を指定する */ 
+	border-top: 1px solid #666666;	/* テーブル罫線上部のスタイルを指定する */
+	border-left: 1px solid #666666;	/* テーブル罫線左側のスタイルを指定する */
+}
+.table th{
+	width:auto;						/* 見出しの横幅を指定する */
+	padding:4px;					/* 見出しの余白を指定する(上下左右) */
+	background-color: rgba(170,170,170, 0.3);/* 見出しの背景色を指定する */
+	font-weight: normal;			/* フォントの太さを指定する */
+	color: #326693;					/* フォントの色を指定する */
+	text-align: left;				/* 見出しテキストの位置(横方向)を指定する */
+	vertical-align: top;			/* 見出しテキストの位置(縦方向)を指定する */
+	border-top: 1px solid #666666;		/* 罫線上部のスタイルを指定する */
+	border-bottom: 1px solid #666666;/* 罫線下部のスタイルを指定する */
+	border-left: 1px solid #666666;/* 罫線左側のスタイルを指定する */
+	border-right: 1px solid #666666;/* 罫線右側のスタイルを指定する */
+}
+.table td{
+	width:auto;						/* セルの横幅を指定する */
+	padding:4px;					/* 要素の余白を指定する(上下左右) */
+	background-color: #ffffff;		/* ボックスの背景色を指定する */
+	border-right: 1px solid #666666;/* 罫線右側のスタイルを指定する */
+	border-bottom: 1px solid #666666;/* 罫線下部のスタイルを指定する */
+}
