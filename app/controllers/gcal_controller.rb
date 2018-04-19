@@ -96,7 +96,7 @@ require 'fileutils'
         ss.save
       end
 
-      calendar_page = (referer = request.env['HTTP_REFERER'].match(/index\?i=(\d+)/)) ? referer[1] : nil
+      calendar_page = request.env['HTTP_REFERER'].match(/index\?i=(\d+)/).try(:[], 1)
 
       redirect_to calendar_index_path(i: calendar_page)
     rescue Google::Apis::AuthorizationError
