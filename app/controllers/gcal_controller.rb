@@ -96,7 +96,9 @@ require 'fileutils'
         ss.save
       end
 
-      redirect_to calendar_index_path
+      calendar_page = (referer = request.env['HTTP_REFERER'].match(/index\?i=(\d+)/)) ? referer[1] : nil
+
+      redirect_to calendar_index_path(i: calendar_page)
     rescue Google::Apis::AuthorizationError
       client = Signet::OAuth2::Client.new(client_options)
       redirect_to client.authorization_uri.to_s
